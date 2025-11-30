@@ -1,0 +1,11 @@
+camera_name: "hikrobot"
+exposure_ms: 2
+gain: 16
+vid_pid: 2bdf:0001
+
+xml_path: "/home/yagami_light/Desktop/2026_dart_guide/assets/Katrin.xml"
+bin_path: "/home/yagami_light/Desktop/2026_dart_guide/assets/Katrin.bin"
+device: "CPU"
+
+score_threshold: 0.5
+nms_threshold: 0.4
