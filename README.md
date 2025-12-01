@@ -7,9 +7,13 @@
 mkdir build
 cmake ..
 cmake -j
+./standard
 ```
 ## 识别：
 海康相机获取图像，openvino识别，多线程TBD
 
 ## 串口通信
 TBD
+
+## tips:
+经测试，MV-CS016-10UC相机+8mm镜头 ，即自瞄常用的配置，在17米处和25米处均能稳定准确识别引导灯。
