@@ -41,15 +41,28 @@ int main(int argc, char * argv[]) {
         // 3. 处理显示逻辑
         if (!is_startup) {
             // 此时 lights 对应的是 img_prev，所以我们在 img_prev 上画图
+            auto dt = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - std::chrono::steady_clock::now()).count();
+            fmt::print("Frame time: {} ms, FPS: {:.1f}\n", dt, 1000.0 / dt);
             if (!img_prev.empty()) {
                 // 为了显示美观，可以在这里 resize 用于显示的图，而不是影响推理输入
                 cv::Mat img_show = img_prev.clone(); 
                 cv::resize(img_show, img_show, cv::Size2d(640, 480));
 
-                for (const auto &light : lights) {
+                // 取置信度最大的目标进行显示
+                std::sort(lights.begin(), lights.end(),
+                          [](const OpenvinoInfer::Light &a, const OpenvinoInfer::Light &b) {
+                              return a.score > b.score;
+                          });
+                if (!lights.empty()) {
+                    const auto &light = lights[0];
                     cv::rectangle(img_show, light.box, cv::Scalar(0, 255, 0), 2);
                     cv::circle(img_show, light.center_point, 5, cv::Scalar(255, 0, 0), -1);
+
+                    // 串口发送
+                    gimbal.send(light.center_point.x - img_show.cols / 2); // 发送偏移量给云台
                 }
+
+                
                 cv::imshow("Camera Image", img_show);
             }
         }
