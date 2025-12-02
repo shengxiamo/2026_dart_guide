@@ -1,12 +1,14 @@
 #include <fmt/core.h>
 
 #include <chrono>
+#include <nlohmann/json.hpp>
 
 #include "io/camera.hpp"
 #include "io/gimbal/gimbal.hpp"
 
 #include "tasks/light_detect/Detect.hpp"
 #include <opencv2/opencv.hpp>
+#include "tools/plotter.hpp"
 
 const std::string keys =
   "{help h usage ? |      | 输出命令行参数说明}"
@@ -23,6 +25,8 @@ int main(int argc, char * argv[]) {
     io::Gimbal gimbal(config_path);
     io::Camera camera(config_path);
     LightDetect light_detect(config_path);
+    nlohmann::json data;
+    tools::Plotter plotter;
 
     cv::Mat img_curr, img_prev; // 定义当前帧和上一帧
     std::chrono::steady_clock::time_point timestamp;
@@ -41,8 +45,9 @@ int main(int argc, char * argv[]) {
         // 3. 处理显示逻辑
         if (!is_startup) {
             // 此时 lights 对应的是 img_prev，所以我们在 img_prev 上画图
-            auto dt = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - std::chrono::steady_clock::now()).count();
+            auto dt = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - timestamp).count();
             fmt::print("Frame time: {} ms, FPS: {:.1f}\n", dt, 1000.0 / dt);
+            data["FPS"] = 1000.0 / dt;
             if (!img_prev.empty()) {
                 // 为了显示美观，可以在这里 resize 用于显示的图，而不是影响推理输入
                 cv::Mat img_show = img_prev.clone(); 
@@ -64,6 +69,7 @@ int main(int argc, char * argv[]) {
 
                 
                 cv::imshow("Camera Image", img_show);
+                plotter.plot(data);
             }
         }
 
