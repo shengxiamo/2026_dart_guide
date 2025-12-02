@@ -79,13 +79,8 @@ Eigen::Quaterniond Gimbal::q(std::chrono::steady_clock::time_point t)
 
 void Gimbal::send(io::VisionToGimbal VisionToGimbal)
 {
-  tx_data_.mode = VisionToGimbal.mode;
-  tx_data_.yaw = VisionToGimbal.yaw;
-  tx_data_.yaw_vel = VisionToGimbal.yaw_vel;
-  tx_data_.yaw_acc = VisionToGimbal.yaw_acc;
-  tx_data_.pitch = VisionToGimbal.pitch;
-  tx_data_.pitch_vel = VisionToGimbal.pitch_vel;
-  tx_data_.pitch_acc = VisionToGimbal.pitch_acc;
+  tx_data_.yaw_offset = VisionToGimbal.yaw_offset;
+
   tx_data_.crc16 = tools::get_crc16(
     reinterpret_cast<uint8_t *>(&tx_data_), sizeof(tx_data_) - sizeof(tx_data_.crc16));
 
@@ -96,17 +91,9 @@ void Gimbal::send(io::VisionToGimbal VisionToGimbal)
   }
 }
 
-void Gimbal::send(
-  bool control, bool fire, float yaw, float yaw_vel, float yaw_acc, float pitch, float pitch_vel,
-  float pitch_acc)
+void Gimbal::send(float yaw_offset)
 {
-  tx_data_.mode = control ? (fire ? 2 : 1) : 0;
-  tx_data_.yaw = yaw;
-  tx_data_.yaw_vel = yaw_vel;
-  tx_data_.yaw_acc = yaw_acc;
-  tx_data_.pitch = pitch;
-  tx_data_.pitch_vel = pitch_vel;
-  tx_data_.pitch_acc = pitch_acc;
+  tx_data_.yaw_offset = yaw_offset;
   tx_data_.crc16 = tools::get_crc16(
     reinterpret_cast<uint8_t *>(&tx_data_), sizeof(tx_data_) - sizeof(tx_data_.crc16));
 

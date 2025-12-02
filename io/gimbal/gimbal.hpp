@@ -32,14 +32,8 @@ static_assert(sizeof(GimbalToVision) <= 64);
 
 struct __attribute__((packed)) VisionToGimbal
 {
-  uint8_t head[2] = {'S', 'P'};
-  uint8_t mode;  // 0: 不控制, 1: 控制云台但不开火，2: 控制云台且开火
-  float yaw;
-  float yaw_vel;
-  float yaw_acc;
-  float pitch;
-  float pitch_vel;
-  float pitch_acc;
+  uint8_t head[2] = {'R', 'Z'};
+  float yaw_offset;
   uint16_t crc16;
 };
 
@@ -75,9 +69,7 @@ public:
   std::string str(GimbalMode mode) const;
   Eigen::Quaterniond q(std::chrono::steady_clock::time_point t);
 
-  void send(
-    bool control, bool fire, float yaw, float yaw_vel, float yaw_acc, float pitch, float pitch_vel,
-    float pitch_acc);
+  void send(float yaw_offset);
 
   void send(io::VisionToGimbal VisionToGimbal);
 
