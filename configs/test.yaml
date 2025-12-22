@@ -11,6 +11,7 @@ score_threshold: 0.5
 nms_threshold: 0.4
 
 com_port: "/dev/ttyACM0"
+baud_rate: 115200
 
 # 重投影误差: 0.0734px
 camera_matrix: [2356.3525680639673, 0, 712.79730945437075, 0, 2357.8001316954378, 556.32597083182532, 0, 0, 1]
