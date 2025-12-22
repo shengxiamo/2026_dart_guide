@@ -10,20 +10,18 @@ Gimbal::Gimbal(const std::string & config_path)
 {
   auto yaml = tools::load(config_path);
   auto com_port = tools::read<std::string>(yaml, "com_port");
+  auto baud_rate = tools::read<int>(yaml, "baud_rate"）);
+  serial_.setBaudrate(baud_rate);
 
   try {
     serial_.setPort(com_port);
-    serial_.setBaudrate(115200);
+
     serial_.open();
   } catch (const std::exception & e) {
     tools::logger()->error("[Gimbal] Failed to open serial: {}", e.what());
     exit(1);
   }
 
-  rx_data_.head[0] = 'E';
-  rx_data_.head[1] = 'C';
-  tx_data_.head[0] = 'V';
-  tx_data_.head[1] = 'C';
 
   thread_ = std::thread(&Gimbal::read_thread, this);
   tools::logger()->info("[Gimbal] Serial port opened, read thread started.");
