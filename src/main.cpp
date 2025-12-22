@@ -5,6 +5,8 @@
 #include <cmath>
 #include <chrono>
 #include <iostream>
+
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -20,8 +22,12 @@ int main() {
     cv::Mat img;
     bool is_startup = true; 
 
+    
+
     auto yaml = tools::load(config_path);
-    float fov_h = tools::read<float>(yaml, "camera.fov_horizontal");
+    auto camera_matrix = yaml["camera_matrix"].as<std::vector<double>>();
+    const double fx = camera_matrix[0];
+    const double cx = camera_matrix[2];
 
     while (true) {
         std::chrono::steady_clock::time_point timestamp;
@@ -44,10 +50,13 @@ int main() {
             cv::circle(img, light.center_point, 5, cv::Scalar(255, 0, 0), -1);
 
             // 3.1 计算水平像素偏移（目标中心 - 图像中心）
-            float pixel_offset = light.center_point.x - (640 / 2.0f);
+            float pixel_offset = light.center_point.x * 2.25 - cx;
+            float angle_offset_rad = std::atan2(pixel_offset, fx);
+
             // 3.4 构造发送结构体并发送
             io::VisionToGimbal send_data;
-            send_data.yaw_offset = pixel_offset;
+            send_data.yaw_offset = angle_offset_rad;
+
             printf("Pixel Offset: %.2f\n", pixel_offset);
             gimbal.send(send_data);
         // 原有：显示图像
