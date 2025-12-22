@@ -50,12 +50,12 @@ int main() {
             cv::circle(img, light.center_point, 5, cv::Scalar(255, 0, 0), -1);
 
             // 3.1 计算水平像素偏移（目标中心 - 图像中心）
-            float pixel_offset = light.center_point.x * 2.25 - cx;
-            float angle_offset_rad = std::atan2(pixel_offset, fx);
-
+            // float pixel_offset = light.center_point.x * 2.25 - cx;
+            // float angle_offset_rad = std::atan2(pixel_offset, fx);
+            float pixel_offset = light.center_point.x - (640 / 2.0f);
             // 3.4 构造发送结构体并发送
             io::VisionToGimbal send_data;
-            send_data.yaw_offset = angle_offset_rad;
+            send_data.yaw_offset = pixel_offset;
 
             printf("Pixel Offset: %.2f\n", pixel_offset);
             gimbal.send(send_data);

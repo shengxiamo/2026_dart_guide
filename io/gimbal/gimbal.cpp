@@ -10,7 +10,7 @@ Gimbal::Gimbal(const std::string & config_path)
 {
   auto yaml = tools::load(config_path);
   auto com_port = tools::read<std::string>(yaml, "com_port");
-  auto baud_rate = tools::read<int>(yaml, "baud_rate"）);
+  auto baud_rate = tools::read<int>(yaml, "baud_rate");
   serial_.setBaudrate(baud_rate);
 
   try {
