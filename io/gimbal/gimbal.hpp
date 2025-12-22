@@ -16,45 +16,25 @@ namespace io
 {
 struct __attribute__((packed)) GimbalToVision
 {
-  uint8_t head[2] = {'S', 'P'};
-  uint8_t mode;  // 0: 空闲, 1: 自瞄, 2: 小符, 3: 大符
-  float q[4];    // wxyz顺序
-  float yaw;
-  float yaw_vel;
-  float pitch;
-  float pitch_vel;
-  float bullet_speed;
-  uint16_t bullet_count;  // 子弹累计发送次数
+  uint8_t head[2] = {'E', 'C'};
+  uint8_t state; 
   uint16_t crc16;
 };
 
-static_assert(sizeof(GimbalToVision) <= 64);
-
+static_assert(sizeof(GimbalToVision) == 5); 
 struct __attribute__((packed)) VisionToGimbal
 {
-  uint8_t head[2] = {'R', 'Z'};
+  uint8_t head[2] = {'V', 'C'};
   float yaw_offset;
-  uint16_t crc16;
+  uint16_t crc16; 
 };
-
-static_assert(sizeof(VisionToGimbal) <= 64);
+static_assert(sizeof(VisionToGimbal) == 8); 
 
 enum class GimbalMode
 {
-  IDLE,        // 空闲
-  AUTO_AIM,    // 自瞄
-  SMALL_BUFF,  // 小符
-  BIG_BUFF     // 大符
-};
-
-struct GimbalState
-{
-  float yaw;
-  float yaw_vel;
-  float pitch;
-  float pitch_vel;
-  float bullet_speed;
-  uint16_t bullet_count;
+  ERROR,       // 对应电控00（错误）
+  RUNNING,     // 对应电控01（开始）
+  IDLE         // 视觉本地空闲状态（用于初始化）
 };
 
 class Gimbal
@@ -65,11 +45,7 @@ public:
   ~Gimbal();
 
   GimbalMode mode() const;
-  GimbalState state() const;
   std::string str(GimbalMode mode) const;
-  Eigen::Quaterniond q(std::chrono::steady_clock::time_point t);
-
-  void send(float yaw_offset);
 
   void send(io::VisionToGimbal VisionToGimbal);
 
@@ -79,14 +55,19 @@ private:
   std::thread thread_;
   std::atomic<bool> quit_ = false;
   mutable std::mutex mutex_;
+  // Protects serial operations during reconnect/send/read
+  mutable std::mutex serial_mutex_;
 
   GimbalToVision rx_data_;
   VisionToGimbal tx_data_;
 
   GimbalMode mode_ = GimbalMode::IDLE;
-  GimbalState state_;
-  tools::ThreadSafeQueue<std::tuple<Eigen::Quaterniond, std::chrono::steady_clock::time_point>>
-    queue_{1000};
+
+  // Reconnection and timing tuning (can be read from yaml in constructor)
+  int reconnect_max_retry_count_ = 10;
+  std::chrono::milliseconds reconnect_timeout_{5000};
+  std::chrono::milliseconds slow_packet_threshold_{200};
+  std::chrono::microseconds idle_read_sleep_{1000};
 
   bool read(uint8_t * buffer, size_t size);
   void read_thread();
