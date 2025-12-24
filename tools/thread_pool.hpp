@@ -60,12 +60,14 @@ public:
 
   void enqueue(const tools::Frame & item)
   {
-    std::lock_guard<std::mutex> lock(mutex_);
+    //std::lock_guard<std::mutex> lock(mutex_);
 
     if (item.id < current_id_) {
       tools::logger()->warn("small id");
       return;
     }
+    
+    std::lock_guard<std::mutex> lock(mutex_);
 
     if (item.id == current_id_) {
       main_queue_.push(item);

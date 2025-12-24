@@ -55,7 +55,6 @@ private:
   std::thread thread_;
   std::atomic<bool> quit_ = false;
   mutable std::mutex mutex_;
-  // Protects serial operations during reconnect/send/read
   mutable std::mutex serial_mutex_;
 
   GimbalToVision rx_data_;
@@ -63,7 +62,6 @@ private:
 
   GimbalMode mode_ = GimbalMode::IDLE;
 
-  // Reconnection and timing tuning (can be read from yaml in constructor)
   int reconnect_max_retry_count_ = 10;
   std::chrono::milliseconds reconnect_timeout_{5000};
   std::chrono::milliseconds slow_packet_threshold_{200};
