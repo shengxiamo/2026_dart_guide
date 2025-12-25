@@ -7,7 +7,7 @@ xml_path: "assets/Katrin.xml"
 bin_path: "assets/Katrin.bin"
 device: "CPU"
 
-score_threshold: 0.5
+score_threshold: 0.9
 nms_threshold: 0.4
 
 com_port: "/dev/ttyACM0"
