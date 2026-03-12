@@ -3,13 +3,14 @@
 理论上sp_vision能跑这个就能跑
 ##  编译
     ```bash
-    cmake -B build
+    
+    ```cmake -B build
     make -C build/ -j `nproc`
-    ```
 
 ## 运行
-    ```bash
-    ./build/standard
+    ```bash./build/standard
+    
+    
     ```
 
 

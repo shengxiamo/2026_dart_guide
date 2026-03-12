@@ -31,3 +31,7 @@ add_executable(standard src/main.cpp)
 
 target_link_libraries(standard ${OpenCV_LIBS} fmt::fmt yaml-cpp  tools io light_detect)
 
+add_executable(hsv_tuner tools/hsv_tuner.cpp)
+# hsv_tuner needs IO, tools, and their dependencies (fmt, spdlog)
+target_link_libraries(hsv_tuner ${OpenCV_LIBS} fmt::fmt spdlog::spdlog yaml-cpp tools io)
+
